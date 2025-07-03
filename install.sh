@@ -1,15 +1,16 @@
 #!/bin/bash
-git clone git@github.com:CompVis/EDGS.git --recursive 
+git clone https://github.com/N-Demir/EDGS.git --recursive 
 cd EDGS
 git submodule update --init --recursive 
 
 conda create -y -n edgs python=3.10 pip
 conda activate edgs
 
-# Optionally set path to CUDA
-export CUDA_HOME=/usr/local/cuda-12.1
-export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
-export PATH=$CUDA_HOME/bin:$PATH
+# Removed in favor of preconfigured dockerfile
+# # Optionally set path to CUDA
+# export CUDA_HOME=/usr/local/cuda-12.1
+# export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+# export PATH=$CUDA_HOME/bin:$PATH
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y
 conda install nvidia/label/cuda-12.1.0::cuda-toolkit -y
 

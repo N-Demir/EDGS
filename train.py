@@ -51,7 +51,12 @@ def main(cfg: omegaconf.DictConfig):
     
     trainer.load_checkpoints(cfg.load)
     trainer.timer.start()
-    trainer.init_with_corr(cfg.init_wC)      
+    trainer.init_with_corr(cfg.init_wC)
+
+    # if save dense gsplat init is turned on, override the points3D.bin file in the data folder
+    # TODO: implement
+    breakpoint()
+
     trainer.train(cfg.train)
     
     # All done
