@@ -5,9 +5,9 @@ defaults:
 seed: 228
 
 wandb:
-  mode: "online" # "disabled" for no logging
-  entity: "3dcorrespondence"
-  project: "Adv3DGS"
+  mode: "online" #"online" # "disabled" for no logging
+  entity: "nikitademir"
+  project: "EDGS"
   group: null
   name: null
   tag: "debug"

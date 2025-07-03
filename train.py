@@ -53,9 +53,11 @@ def main(cfg: omegaconf.DictConfig):
     trainer.timer.start()
     trainer.init_with_corr(cfg.init_wC)
 
-    # if save dense gsplat init is turned on, override the points3D.bin file in the data folder
+    # if save dense gsplat init is turned on, create a new? points3D.bin file in the data folder, or maybe it should overwrite the sparse folder? not sure
+    # probably easiest thing is to create an entirely new dataset but keep the name the same. Wasteful, but easier to use in downstream methods
     # TODO: implement
     breakpoint()
+    # trainer.gaussians._xyz.shape for example works
 
     trainer.train(cfg.train)
     
