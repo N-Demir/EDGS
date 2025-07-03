@@ -1,1 +1,0 @@
-Namespace(sh_degree=3, source_path='/root/data/tandt/truck', model_path='test', images='images', depths='', resolution=-1, _white_background=False, train_test_exp=False, data_device='cuda', eval=False, convert_SHs_python=False, compute_cov3D_python=False, debug=False, antialiasing=False)
