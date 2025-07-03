@@ -1,10 +1,15 @@
 #!/bin/bash
+# Exit immediately if a command exits with a non-zero status
+# This helps catch errors early in the script execution
+set -e
+
 git clone https://github.com/N-Demir/EDGS.git --recursive 
 cd EDGS
 git submodule update --init --recursive 
 
-conda create -y -n edgs python=3.10 pip
-conda activate edgs
+# I think the following don't work when installing through a shell command in modal
+# conda create -y -n edgs python=3.10 pip
+# conda activate edgs
 
 # Removed in favor of preconfigured dockerfile
 # # Optionally set path to CUDA

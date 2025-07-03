@@ -1,5 +1,5 @@
 # Use PyTorch CUDA image as base
-FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-devel
 
 # Makes debugging easier because python logs are sent immediately
 ENV DEBIAN_FRONTEND=noninteractive

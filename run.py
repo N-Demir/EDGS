@@ -29,6 +29,8 @@ app = modal.App("gsplat", image=modal.Image.from_dockerfile(Path(__file__).paren
     .run_commands("git config --global pull.rebase true")
     .run_commands("git config --global user.name 'Nikita Demir'")
     .run_commands("git config --global user.email 'nikitde1@gmail.com'")
+    # Set CUDA Architecture (depends on the GPU)
+    .run_commands("export TORCH_CUDA_ARCH_LIST='7.0;7.5;8.0;8.6;8.9;9.0'")
     # Add Our Code and Install EDGS
     .workdir("/root/workspace")
     .add_local_file(Path(__file__).parent / "install.sh", "/root/workspace/install.sh", copy=True)
