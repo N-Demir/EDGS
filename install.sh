@@ -3,6 +3,12 @@
 # This helps catch errors early in the script execution
 set -e
 
+# Check that the torch cuda arg env is set
+if [ -z "$TORCH_CUDA_ARCH_LIST" ]; then
+    echo "TORCH_CUDA_ARCH_LIST is not set"
+    exit 1
+fi
+
 git clone https://github.com/N-Demir/EDGS.git --recursive 
 cd EDGS
 git submodule update --init --recursive 
