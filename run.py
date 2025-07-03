@@ -35,7 +35,6 @@ app = modal.App("gsplat", image=modal.Image.from_dockerfile(Path(__file__).paren
     .workdir("/root/workspace")
     .add_local_file(Path(__file__).parent / "install.sh", "/root/workspace/install.sh", copy=True)
     .run_commands("sh install.sh")
-    # .add_local_dir(Path(__file__).parent, "/root/workspace/EDGS")
 )
 
 
