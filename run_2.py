@@ -55,6 +55,7 @@ app = modal.App("gsplat", image=modal.Image.from_dockerfile(Path(__file__).paren
     .run_commands("pip install gradio")
     .run_commands("pip install plotly scikit-learn moviepy==2.1.1 ffmpeg")
     .run_commands("pip install open3d")
+    .run_commands("apt install rsync")
     # Get the latest code
     .run_commands("git pull", force_build=True)
 )
