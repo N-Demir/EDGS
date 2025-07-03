@@ -30,13 +30,32 @@ app = modal.App("gsplat", image=modal.Image.from_dockerfile(Path(__file__).paren
     .run_commands("git config --global user.name 'Nikita Demir'")
     .run_commands("git config --global user.email 'nikitde1@gmail.com'")
     # Set CUDA Architecture (depends on the GPU)
-    .env({"TORCH_CUDA_ARCH_LIST": "7.0;7.5;8.0;8.6;8.9;9.0"})
+    .env({"TORCH_CUDA_ARCH_LIST": "7.5"})
     # Add Our Code and Install EDGS
     .workdir("/root/workspace")
-    .add_local_file(Path(__file__).parent / "install.sh", "/root/workspace/install.sh", copy=True)
-    .run_commands("sh install.sh")
-    # Get the latest code
+    # Clone EDGS repository
+    .run_commands("git clone https://github.com/N-Demir/EDGS.git --recursive")
     .workdir("/root/workspace/EDGS")
+    .run_commands("git submodule update --init --recursive")
+    # Install submodules
+    .run_commands("pip install -e submodules/gaussian-splatting/submodules/diff-gaussian-rasterization")
+    .run_commands("pip install -e submodules/gaussian-splatting/submodules/simple-knn")
+    # Install PyTorch and CUDA
+    # .run_commands("conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia -y")
+    # .run_commands("conda install nvidia/label/cuda-12.1.0::cuda-toolkit -y")
+    # Install COLMAP
+    .run_commands("pip install pycolmap")
+    # Install other dependencies
+    .run_commands("pip install wandb hydra-core tqdm torchmetrics lpips matplotlib rich plyfile imageio imageio-ffmpeg")
+    .run_commands("conda install numpy=1.26.4 -y -c conda-forge --override-channels")
+    # Install RoMa
+    .run_commands("pip install -e submodules/RoMa")
+    .run_commands("conda install anaconda::jupyter --yes")
+    # Install visualization dependencies
+    .run_commands("pip install gradio")
+    .run_commands("pip install plotly scikit-learn moviepy==2.1.1 ffmpeg")
+    .run_commands("pip install open3d")
+    # Get the latest code
     .run_commands("git pull", force_build=True)
 )
 
@@ -61,12 +80,12 @@ def wait_for_port(host, port, q):
     timeout=3600 * 24,
     gpu="T4",
     secrets=[modal.Secret.from_name("wandb-secret"), modal.Secret.from_name("github-token")],
-    volumes={"/root/.cursor-server": modal.Volume.from_name("cursor-server", create_if_missing=True), 
+    volumes={
              "/root/data": modal.Volume.from_name("data", create_if_missing=True),
              "/root/output": modal.Volume.from_name("output", create_if_missing=True),
              "/root/ever_training": modal.Volume.from_name("ever-training", create_if_missing=True)}
 )
-def launch_ssh(q):
+def launch_ssh_2(q):
     with modal.forward(22, unencrypted=True) as tunnel:
         host, port = tunnel.tcp_socket
         threading.Thread(target=wait_for_port, args=(host, port, q)).start()
@@ -82,7 +101,7 @@ def main():
     import sshtunnel
 
     with modal.Queue.ephemeral() as q:
-        launch_ssh.spawn(q)
+        launch_ssh_2.spawn(q)
         host, port = q.get()
         print(f"SSH server running at {host}:{port}")
 
