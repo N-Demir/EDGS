@@ -1,3 +1,6 @@
+I really like their usage of wandb and the outputs at the end of runs. Pretty. In the long run probably a good idea
+
+---
 Neat that the homogeneous camera matrices are used to
 - select a representative subset of K cameras (first get K clusters with k-means, then select the camera closest to each cluster center)
 - then to select nearest neighboring camera to each camera
