@@ -162,17 +162,18 @@ def main(cfg: omegaconf.DictConfig):
     trainer.timer.start()
     trainer.init_with_corr(cfg.init_wC)
 
-    # Convert gaussians and copy dataset
-    points3D, new_dataset_path = convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg)
-    print("New dataset path: ", new_dataset_path)
-    print("Number of points saved: ", len(points3D))
+    if cfg.init_wC.use:
+        # Convert gaussians and copy dataset
+        points3D, new_dataset_path = convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg)
+        print("New dataset path: ", new_dataset_path)
+        print("Number of points saved: ", len(points3D))
 
-    # Check if we should exit early after initialization and conversion
-    if cfg.only_init_with_corr:
-        print("\nEarly exit requested: only_init_with_corr=True")
-        print("Gaussians converted to points3D and dataset saved successfully.")
-        wandb.finish()
-        return
+        # Check if we should exit early after initialization and conversion
+        if cfg.only_init_with_corr:
+            print("\nEarly exit requested: only_init_with_corr=True")
+            print("Gaussians converted to points3D and dataset saved successfully.")
+            wandb.finish()
+            return
 
     trainer.train(cfg.train)
     
