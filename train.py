@@ -81,10 +81,10 @@ def convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg):
     if os.path.exists(source_sparse_0_path):
         print(f"Copying sparse/0 folder using rsync (excluding .ply files)...")
         os.makedirs(new_sparse_path, exist_ok=True)
-            # rsync -av --progress --exclude='*.ply': archive mode, verbose, show progress, exclude .ply files
-            cmd = ['rsync', '-av', '--progress', '--exclude=*.ply', source_sparse_0_path + '/', new_sparse_0_path + '/']
-            subprocess.run(cmd, check=True)
-            print("Sparse/0 folder copied successfully! (excluding .ply files)")
+        # rsync -av --progress --exclude='*.ply': archive mode, verbose, show progress, exclude .ply files
+        cmd = ['rsync', '-av', '--progress', '--exclude=*.ply', source_sparse_0_path + '/', new_sparse_0_path + '/']
+        subprocess.run(cmd, check=True)
+        print("Sparse/0 folder copied successfully! (excluding .ply files)")
     else:
         print(f"Warning: sparse/0 folder not found at {source_sparse_0_path}")
         # Create empty sparse/0 directory if it doesn't exist
