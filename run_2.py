@@ -97,30 +97,55 @@ def launch_ssh_2(q):
 
         subprocess.run(["/usr/sbin/sshd", "-D"])  # TODO: I don't know why I need to start this here
 
+
+@app.function(
+    timeout=3600 * 24,
+    gpu="T4",
+    secrets=[modal.Secret.from_name("wandb-secret"), modal.Secret.from_name("github-token")],
+    volumes={
+             "/root/data": modal.Volume.from_name("data", create_if_missing=True),
+             "/root/output": modal.Volume.from_name("output", create_if_missing=True),
+             "/root/ever_training": modal.Volume.from_name("ever-training", create_if_missing=True)}
+)
+def run_shell_script(shell_file_path: str):
+    """Run a shell script on the remote Modal instance."""
+    # Run the shell script
+    print(f"Running shell script: {shell_file_path}")
+    subprocess.run([shell_file_path], 
+                  shell=True, 
+                  cwd=".")
+
+
 @app.local_entrypoint()
-def main():
-    import sshtunnel
+def main(as_server: bool = False, shell_file: str = None):   
+    if as_server:
+        import sshtunnel
 
-    with modal.Queue.ephemeral() as q:
-        launch_ssh_2.spawn(q)
-        host, port = q.get()
-        print(f"SSH server running at {host}:{port}")
+        with modal.Queue.ephemeral() as q:
+            launch_ssh_2.spawn(q)
+            host, port = q.get()
+            print(f"SSH server running at {host}:{port}")
 
-        server = sshtunnel.SSHTunnelForwarder(
-            (host, port),
-            ssh_username="root",
-            ssh_password=" ",
-            remote_bind_address=("127.0.0.1", 22),
-            local_bind_address=("127.0.0.1", LOCAL_PORT),
-            allow_agent=False,
-        )
+            server = sshtunnel.SSHTunnelForwarder(
+                (host, port),
+                ssh_username="root",
+                ssh_password=" ",
+                remote_bind_address=("127.0.0.1", 22),
+                local_bind_address=("127.0.0.1", LOCAL_PORT),
+                allow_agent=False,
+            )
 
-        try:
-            server.start()
-            print(f"SSH tunnel forwarded to localhost:{server.local_bind_port}")
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print("\nShutting down SSH tunnel...")
-        finally:
-            server.stop()
+            try:
+                server.start()
+                print(f"SSH tunnel forwarded to localhost:{server.local_bind_port}")
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\nShutting down SSH tunnel...")
+            finally:
+                server.stop()
+
+    if shell_file:
+        # Run the shell script on the remote instance
+        print(f"Running shell script: {shell_file}")
+        run_shell_script.remote(shell_file)
