@@ -86,7 +86,7 @@ def wait_for_port(host, port, q):
              "/root/output": modal.Volume.from_name("output", create_if_missing=True),
              "/root/ever_training": modal.Volume.from_name("ever-training", create_if_missing=True)}
 )
-def launch_ssh_2(q):
+def launch_ssh_server(q):
     with modal.forward(22, unencrypted=True) as tunnel:
         host, port = tunnel.tcp_socket
         threading.Thread(target=wait_for_port, args=(host, port, q)).start()
@@ -111,18 +111,18 @@ def run_shell_script(shell_file_path: str):
     """Run a shell script on the remote Modal instance."""
     # Run the shell script
     print(f"Running shell script: {shell_file_path}")
-    subprocess.run([shell_file_path], 
+    subprocess.run("bash " + shell_file_path, 
                   shell=True, 
                   cwd=".")
 
 
 @app.local_entrypoint()
-def main(as_server: bool = False, shell_file: str = None):   
+def main(as_server: bool = False, shell_file: str | None = None):   
     if as_server:
         import sshtunnel
 
         with modal.Queue.ephemeral() as q:
-            launch_ssh_2.spawn(q)
+            launch_ssh_server.spawn(q)
             host, port = q.get()
             print(f"SSH server running at {host}:{port}")
 
