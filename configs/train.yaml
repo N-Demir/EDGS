@@ -4,6 +4,9 @@ defaults:
 
 seed: 228
 
+# Early exit option: if True, exit after converting gaussians to points3D and saving dataset
+only_init_with_corr: False
+
 wandb:
   mode: "online" #"online" # "disabled" for no logging
   entity: "nikitademir"

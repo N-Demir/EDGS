@@ -7,6 +7,29 @@ import time
 
 import modal
 
+MODAL_SECRETS = [modal.Secret.from_name("wandb-secret"), modal.Secret.from_name("github-token")]
+MODAL_VOLUMES = {
+    "/root/data": modal.Volume.from_name("data", create_if_missing=True),
+    "/root/output": modal.Volume.from_name("output", create_if_missing=True),
+}
+
+def dummy_function():
+    # Testing whether this could get models downloaded and cuda things prebuilt
+    # but needs to be placed into a python function unfortunately so that modal can properly
+    # run it with `run_function` and attach a volume
+    print("Running dummy function")
+    subprocess.run([
+        "python", "train.py",
+        "train.gs_epochs=5",
+        "train.no_densify=True", 
+        "gs.dataset.source_path=/root/data/tandt/truck",
+        "gs.dataset.model_path=/dummy_run_output",
+        "init_wC.matches_per_ref=10",
+        "init_wC.nns_per_ref=3",
+        "init_wC.num_refs=5"
+    ], cwd=".")    
+
+
 app = modal.App("gsplat", image=modal.Image.from_dockerfile(Path(__file__).parent / "Dockerfile")
     # GCloud
     .add_local_file(Path.home() / "gcs-tour-project-service-account-key.json", "/root/gcs-tour-project-service-account-key.json", copy=True)
@@ -56,6 +79,9 @@ app = modal.App("gsplat", image=modal.Image.from_dockerfile(Path(__file__).paren
     .run_commands("pip install plotly scikit-learn moviepy==2.1.1 ffmpeg")
     .run_commands("pip install open3d")
     .run_commands("apt install rsync -y")
+    # Post install, try actually running a demo example to prebuild/download things
+    .run_commands("git pull")
+    .run_function(dummy_function, secrets=MODAL_SECRETS, volumes=MODAL_VOLUMES, gpu="T4")
     # Get the latest code
     .run_commands("git pull", force_build=True)
 )
@@ -80,11 +106,8 @@ def wait_for_port(host, port, q):
 @app.function(
     timeout=3600 * 24,
     gpu="T4",
-    secrets=[modal.Secret.from_name("wandb-secret"), modal.Secret.from_name("github-token")],
-    volumes={
-             "/root/data": modal.Volume.from_name("data", create_if_missing=True),
-             "/root/output": modal.Volume.from_name("output", create_if_missing=True),
-             "/root/ever_training": modal.Volume.from_name("ever-training", create_if_missing=True)}
+    secrets=MODAL_SECRETS,
+    volumes=MODAL_VOLUMES
 )
 def launch_ssh_server(q):
     with modal.forward(22, unencrypted=True) as tunnel:
