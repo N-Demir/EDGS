@@ -10,6 +10,7 @@ import numpy as np
 from read_write_model import Point3D, write_points3D_binary, write_points3D_text
 import shutil
 import subprocess
+from utils.sh_utils import SH2RGB
 
 
 def convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg):
@@ -30,9 +31,10 @@ def convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg):
     xyz = trainer.gaussians._xyz.detach().cpu().numpy()  # Shape: (N, 3)
     features_dc = trainer.gaussians._features_dc.detach().cpu().numpy()  # Shape: (N, 1, 3)
     
+
     # Convert features_dc to RGB colors (assuming they're in the range [0, 1])
     # features_dc has shape (N, 1, 3), we need to squeeze and convert to uint8
-    rgb = (features_dc.squeeze(1) * 255).astype(np.uint8)  # Shape: (N, 3)
+    rgb = (SH2RGB(features_dc.squeeze(1)) * 255).astype(np.uint8)  # Shape: (N, 3)
     
     # Create points3D dictionary
     points3D = {}

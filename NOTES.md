@@ -1,3 +1,8 @@
+Exported `points3d.bin` do not include the EDGS initialized scale/rotation/opacity etc. It's just a pointcloud. Would be interesting to test down the road whether that makes a difference or not. Some simple heurestics for setting them could be helpful I'm sure? 
+
+- scale seems to be set by distance of 3d point to the camera center
+- opacity set by triangulation error quality (seems like a reasonable move)
+---
 Run with `modal run -d run.py --shell-file experiments/truck.sh`
 ---
 I really like their usage of wandb and the outputs at the end of runs. Pretty. In the long run probably a good idea
