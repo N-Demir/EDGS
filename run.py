@@ -30,7 +30,7 @@ def dummy_function():
     ], cwd=".")    
 
 
-app = modal.App("gsplat", image=modal.Image.from_dockerfile(Path(__file__).parent / "Dockerfile")
+app = modal.App("edgs", image=modal.Image.from_dockerfile(Path(__file__).parent / "Dockerfile")
     # GCloud
     .add_local_file(Path.home() / "gcs-tour-project-service-account-key.json", "/root/gcs-tour-project-service-account-key.json", copy=True)
     .run_commands(
