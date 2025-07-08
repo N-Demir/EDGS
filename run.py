@@ -57,7 +57,7 @@ app = modal.App("edgs", image=modal.Image.from_dockerfile(Path(__file__).parent 
     # Add Our Code and Install EDGS
     .workdir("/root/workspace")
     # Clone EDGS repository
-    .run_commands("git clone https://github.com/N-Demir/EDGS.git --recursive")
+    .run_commands("git clone https://github.com/N-Demir/EDGS.git . --recursive")
     .workdir("/root/workspace/EDGS")
     .run_commands("git submodule update --init --recursive")
     # Install submodules
