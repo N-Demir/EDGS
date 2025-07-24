@@ -159,7 +159,6 @@ def run(capture_name: str):
     data_volume.commit()
 
 
-
 @app.local_entrypoint()
 def main(as_server: bool = False, shell_file: str | None = None):   
     if as_server:
