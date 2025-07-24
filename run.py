@@ -8,10 +8,13 @@ import time
 import modal
 
 MODAL_SECRETS = [modal.Secret.from_name("wandb-secret"), modal.Secret.from_name("github-token")]
+data_volume = modal.Volume.from_name("data", create_if_missing=True)
+output_volume = modal.Volume.from_name("output", create_if_missing=True)
 MODAL_VOLUMES = {
-    "/root/data": modal.Volume.from_name("data", create_if_missing=True),
-    "/root/output": modal.Volume.from_name("output", create_if_missing=True),
+    "/root/data": data_volume,
+    "/root/output": output_volume,
 }
+
 
 def dummy_function():
     # Testing whether this could get models downloaded and cuda things prebuilt
@@ -133,11 +136,8 @@ def launch_ssh_server(q):
 @app.function(
     timeout=3600 * 24,
     gpu="T4",
-    secrets=[modal.Secret.from_name("wandb-secret"), modal.Secret.from_name("github-token")],
-    volumes={
-             "/root/data": modal.Volume.from_name("data", create_if_missing=True),
-             "/root/output": modal.Volume.from_name("output", create_if_missing=True),
-             "/root/ever_training": modal.Volume.from_name("ever-training", create_if_missing=True)}
+    secrets=MODAL_SECRETS,
+    volumes=MODAL_VOLUMES
 )
 def run_shell_script(shell_file_path: str):
     """Run a shell script on the remote Modal instance."""
@@ -146,6 +146,18 @@ def run_shell_script(shell_file_path: str):
     subprocess.run("bash " + shell_file_path, 
                   shell=True, 
                   cwd=".")
+    
+@app.function(
+    timeout=3600,
+    gpu="T4",
+    secrets=MODAL_SECRETS,
+    volumes=MODAL_VOLUMES
+)
+def run(capture_name: str):
+    data_volume.reload()
+    subprocess.run(f"python train.py gs.dataset.source_path=/root/data/{capture_name} init_wC.matches_per_ref=10000 init_wC.nns_per_ref=3 init_wC.num_refs=180 only_init_with_corr=True", shell=True)
+    data_volume.commit()
+
 
 
 @app.local_entrypoint()

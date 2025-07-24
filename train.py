@@ -50,47 +50,12 @@ def convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg):
     
     # Create new dataset folder with _edgs suffix
     source_dataset_path = cfg.gs.dataset.source_path
-    dataset_name = os.path.basename(source_dataset_path)
-    new_dataset_name = dataset_name + "_edgs"
-    new_dataset_path = os.path.join(os.path.dirname(source_dataset_path), new_dataset_name)
-    
-    print(f"Copying essential dataset folders from {source_dataset_path} to {new_dataset_path}...")
-    
-    # Remove existing directory if it exists
-    if os.path.exists(new_dataset_path):
-        shutil.rmtree(new_dataset_path)
-    
-    # Create the new directory structure
-    os.makedirs(new_dataset_path, exist_ok=True)
-    
-    # Copy only the images folder using rsync with progress
-    source_images_path = os.path.join(source_dataset_path, "images")
-    new_images_path = os.path.join(new_dataset_path, "images")
-    if os.path.exists(source_images_path):
-        print(f"Copying images folder using rsync...")
-        # rsync -av --progress: archive mode, verbose, show progress
-        cmd = ['rsync', '-av', '--progress', source_images_path + '/', new_images_path + '/']
-        subprocess.run(cmd, check=True)
-        print("Images folder copied successfully!")
-    else:
-        print(f"Warning: images folder not found at {source_images_path}")
-    
-    # Copy only the sparse/0 folder using rsync with progress
     source_sparse_0_path = os.path.join(source_dataset_path, "sparse", "0")
-    new_sparse_path = os.path.join(new_dataset_path, "sparse")
-    new_sparse_0_path = os.path.join(new_sparse_path, "0")
+    new_sparse_0_path = os.path.join(source_dataset_path, "sparse_edgs", "0")
     
-    if os.path.exists(source_sparse_0_path):
-        print(f"Copying sparse/0 folder using rsync (excluding .ply files)...")
-        os.makedirs(new_sparse_path, exist_ok=True)
-        # rsync -av --progress --exclude='*.ply': archive mode, verbose, show progress, exclude .ply files
-        cmd = ['rsync', '-av', '--progress', '--exclude=*.ply', source_sparse_0_path + '/', new_sparse_0_path + '/']
-        subprocess.run(cmd, check=True)
-        print("Sparse/0 folder copied successfully! (excluding .ply files)")
-    else:
-        print(f"Warning: sparse/0 folder not found at {source_sparse_0_path}")
-        # Create empty sparse/0 directory if it doesn't exist
-        os.makedirs(new_sparse_0_path, exist_ok=True)
+    # Remove destination if it exists, then create the directory structure
+    shutil.rmtree(new_sparse_0_path, ignore_errors=True)
+    os.makedirs(new_sparse_0_path, exist_ok=True)
     
     # Save points3D files in the sparse/0 folder, overwriting only existing ones
     # Check what point cloud files exist in the original sparse/0 folder
@@ -116,7 +81,7 @@ def convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg):
         write_points3D_binary(points3D, points3D_bin_path)
         print(f"Saved {len(points3D)} points to {points3D_bin_path} (binary format, default)")
     
-    return points3D, new_dataset_path
+    return points3D, new_sparse_0_path
 
 
 @hydra.main(config_path="configs", config_name="train", version_base="1.2")
@@ -166,8 +131,8 @@ def main(cfg: omegaconf.DictConfig):
 
     if cfg.init_wC.use:
         # Convert gaussians and copy dataset
-        points3D, new_dataset_path = convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg)
-        print("New dataset path: ", new_dataset_path)
+        points3D, new_sparse_0_path = convert_gaussians_to_points3d_and_copy_dataset(trainer, cfg)
+        print("New dataset path: ", new_sparse_0_path)
         print("Number of points saved: ", len(points3D))
 
         # Check if we should exit early after initialization and conversion
