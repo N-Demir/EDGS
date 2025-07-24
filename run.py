@@ -34,15 +34,6 @@ def dummy_function():
 
 
 app = modal.App("edgs", image=modal.Image.from_dockerfile(Path(__file__).parent / "Dockerfile")
-    # GCloud
-    .add_local_file(Path.home() / "gcs-tour-project-service-account-key.json", "/root/gcs-tour-project-service-account-key.json", copy=True)
-    .run_commands(
-        "gcloud auth activate-service-account --key-file=/root/gcs-tour-project-service-account-key.json",
-        "gcloud config set project tour-project-442218",
-        "gcloud storage ls"
-    )
-    .env({"GOOGLE_APPLICATION_CREDENTIALS": "/root/gcs-tour-project-service-account-key.json"})
-    .run_commands("gcloud storage ls")
     # SSH server
     .apt_install("openssh-server")
     .run_commands(
