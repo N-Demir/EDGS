@@ -61,7 +61,6 @@ app = modal.App("edgs", image=modal.Image.from_dockerfile(Path(__file__).parent 
     .workdir("/root/workspace")
     # Clone EDGS repository
     .run_commands("git clone https://github.com/N-Demir/EDGS.git . --recursive")
-    .workdir("/root/workspace/EDGS")
     .run_commands("git submodule update --init --recursive")
     # Install submodules
     .run_commands("pip install -e submodules/gaussian-splatting/submodules/diff-gaussian-rasterization")
