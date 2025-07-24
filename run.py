@@ -154,7 +154,7 @@ def run_shell_script(shell_file_path: str):
 )
 def run(capture_name: str):
     data_volume.reload()
-    subprocess.run(f"python train.py gs.dataset.source_path=/root/data/{capture_name} init_wC.matches_per_ref=10000 init_wC.nns_per_ref=3 init_wC.num_refs=180 only_init_with_corr=True", shell=True)
+    subprocess.run(f"python train.py gs.dataset.source_path=/root/data/{capture_name} gs.dataset.model_path=/test/ init_wC.matches_per_ref=10000 init_wC.nns_per_ref=3 init_wC.num_refs=180 only_init_with_corr=True", shell=True)
     data_volume.commit()
 
 
