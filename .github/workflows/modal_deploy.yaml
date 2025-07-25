@@ -31,6 +31,7 @@ jobs:
         env:
           SSH_KEY_ENCODED: ${{ secrets.SSH_KEY_ENCODED }}
         run: |
+          mkdir -p ~/.ssh
           echo $SSH_KEY_ENCODED | base64 --decode > ~/.ssh/id_rsa.pub
           chmod 600 ~/.ssh/id_rsa.pub
           modal deploy run.py
