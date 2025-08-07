@@ -8,7 +8,7 @@
 # 
 # Beam will handle building the docker image from this file, but you can also build it yourself and run it wherever you want
 
-FROM pytorch/pytorch:2.4.1-cuda12.4-cudnn9-devel
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-devel
 
 # Set Torch CUDA Compatbility to be for RTX 4090, T4, and A100
 # If using a different GPU, make sure its torch cuda architecture version is added to the list
@@ -43,7 +43,7 @@ WORKDIR /root/workspace
 ###### Method Installation ######
 # Probably easiest to pull the repo from github, but you can also copy files from your local machine with COPY 
 # eg: RUN git clone https://github.com/graphdeco-inria/gaussian-splatting.git . --recursive
-RUN git clone https://github.com/CompVis/EDGS.git --recursive .
+RUN git clone -b nvs-leaderboard https://github.com/N-Demir/EDGS.git --recursive .
 
 # Install (avoid conda installs because they don't work well in dockerfile situations)
 # Separating these on separate lines helps if there are errors (previous lines will be cached) especially on the large package installs
@@ -53,4 +53,19 @@ RUN git clone https://github.com/CompVis/EDGS.git --recursive .
 # RUN pip install submodules/fused-ssim
 # RUN pip install -e .
 # Note: If your install needs access to a gpu it's actually possible to do that through Beam's python sdk. Check their docs or reach out!
-RUN bash install.sh
+
+
+RUN pip install -e submodules/gaussian-splatting/submodules/diff-gaussian-rasterization
+RUN pip install -e submodules/gaussian-splatting/submodules/simple-knn
+RUN pip install -e submodules/RoMa
+
+# For COLMAP and pycolmap
+# Optionally install original colmap but probably pycolmap suffices
+# conda install conda-forge/label/colmap_dev::colmap
+RUN pip install pycolmap
+RUN pip install wandb hydra-core tqdm torchmetrics lpips matplotlib rich plyfile imageio imageio-ffmpeg numpy==1.26.4
+
+# Stuff necessary for gradio and visualizations
+RUN pip install gradio 
+RUN pip install plotly scikit-learn moviepy==2.1.1 ffmpeg
+RUN pip install open3d 
