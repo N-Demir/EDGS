@@ -1,15 +1,23 @@
+# TODO: Add an example
+###### How to edit this file ######
+# Docker and Dockerfiles are quite simple:
+# - a dockerfile is the set of instructions for getting a fresh machine ready to run your code
+# - start by defining a base image (FROM ...) based on the cuda and torch version you want. This gets the hard gpu driver stuff out of the way
+# - set env vars with ENV ..., change directories with WORKDIR ..., and run commands with RUN ...
+# - avoid using conda installs (just replace them with pip installs) because getting conda initialized in docker is a pain
+# 
+# Beam will handle building the docker image from this file, but you can also build it yourself and run it wherever you want
+
 FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-devel
 
+# Set Torch CUDA Compatbility to be for RTX 4090, T4, and A100
+# If using a different GPU, make sure its torch cuda architecture version is added to the list
+ENV TORCH_CUDA_ARCH_LIST="7.5;8.0;8.9;9.0"
+
+# Install git and various other helper dependencies
+# Set environment variable to avoid interactive prompts from installing packages
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/New_York
-RUN apt-get update && apt-get install -y \
-    libassimp-dev \
-    libboost-all-dev \
-    libgtk-3-dev \
-    libopencv-dev \
-    libglfw3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 RUN apt-get update && apt-get install -y \
     openssh-server \
     git \
@@ -19,14 +27,45 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     ninja-build \
     libglew-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update && apt-get install -y \
+    libassimp-dev \
+    libboost-all-dev \
+    libgtk-3-dev \
+    libopencv-dev \
+    libglfw3-dev \
     libavdevice-dev \
     libavcodec-dev \
     libeigen3-dev \
     libxxf86vm-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "Hello, World!"
-RUN sleep 4
+WORKDIR /root/workspace
+
+###### Method Installation ######
+# Probably easiest to pull the repo from github, but you can also copy files from your local machine with COPY 
+# eg: RUN git clone https://github.com/graphdeco-inria/gaussian-splatting.git . --recursive
+RUN git clone -b nvs-leaderboard https://github.com/N-Demir/EDGS.git --recursive .
+
+# Install (avoid conda installs because they don't work well in dockerfile situations)
+# Separating these on separate lines helps if there are errors (previous lines will be cached) especially on the large package installs
+# eg:
+# RUN pip install submodules/diff-gaussian-rasterization
+# RUN pip install submodules/simple-knn
+# RUN pip install submodules/fused-ssim
+# RUN pip install -e .
+# Note: If your install needs access to a gpu it's actually possible to do that through Beam's python sdk. Check their docs or reach out!
+
+
+RUN pip install -e submodules/gaussian-splatting/submodules/diff-gaussian-rasterization
+RUN pip install -e submodules/gaussian-splatting/submodules/simple-knn
+RUN pip install -e submodules/RoMa
+
+# For COLMAP and pycolmap
+# Optionally install original colmap but probably pycolmap suffices
+# conda install conda-forge/label/colmap_dev::colmap
+RUN pip install pycolmap
+RUN pip install wandb hydra-core tqdm torchmetrics lpips matplotlib rich plyfile imageio imageio-ffmpeg numpy==1.26.4
+
+# Stuff necessary for gradio and visualizations
+RUN pip install gradio 
+RUN pip install plotly scikit-learn moviepy==2.1.1 ffmpeg
+RUN pip install open3d 
