@@ -71,3 +71,5 @@ RUN pip install plotly scikit-learn moviepy==2.1.1 ffmpeg
 RUN pip install open3d 
 
 RUN echo "Hello, World!"
+
+RUN echo "Testing this again"
