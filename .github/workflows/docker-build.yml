@@ -10,6 +10,9 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     steps:
+      - name: Delete huge unnecessary tools folder (all space is necessary to build cuda docker images)
+        run: rm -rf /opt/hostedtoolcache
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
