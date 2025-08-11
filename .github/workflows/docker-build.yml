@@ -28,6 +28,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: nikitademir/${{ github.event.repository.name }}:latest
+          tags: nikitademir/edgs:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max 
