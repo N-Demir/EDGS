@@ -7,6 +7,7 @@ import threading
 import time
 
 import modal
+from image import image
 
 
 nvs_leaderboard_data_volume = modal.Volume.from_name("nvs-leaderboard-data", create_if_missing=True)
@@ -17,7 +18,9 @@ MODAL_VOLUMES = {
 }
 
 app = modal.App("nvs-leaderboard-runner", 
-                image=modal.Image.from_dockerfile("Dockerfile").run_commands(
+                # TODO: Dockerfiles don't have their layers cached unfortunately
+                # image=modal.Image.from_dockerfile("Dockerfile").run_commands(
+                image=image.run_commands(
                     "mkdir -p /run/sshd"
                 ).add_local_file(Path.home() / ".ssh/id_rsa.pub", "/root/.ssh/authorized_keys")
                 .add_local_file("nvs_leaderboard_eval.sh", "/root/workspace/nvs_leaderboard_eval.sh")

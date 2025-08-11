@@ -1,0 +1,60 @@
+# Files and directories ignored by gcloud when submitting builds
+# Uses .gitignore-style patterns
+# Docs: https://cloud.google.com/build/docs/speeding-up-builds#ignore
+
+# VCS
+.git/
+.gitignore
+
+# OS junk
+.DS_Store
+
+# Python caches and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Packaging / build artifacts
+build/
+dist/
+.eggs/
+*.egg-info/
+.wheels/
+
+# Test and tooling caches
+.pytest_cache/
+.hypothesis/
+.mypy_cache/
+.cache/
+.coverage*
+coverage.xml
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Project-specific heavy directories and artifacts
+notebooks/
+notebooks_local/
+wandb/
+served_files/
+output*/
+downloads/
+assets/
+
+# Large ML/model artifacts
+*.pt
+*.pth
+*.ply
+*.obj
+*.log
+
+# Keep submodules by default (comment out below to exclude if not needed)
+# submodules/ 
