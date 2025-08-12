@@ -29,8 +29,7 @@ start_time=$(date +%s)
 python train.py wandb.mode="disabled" \
     gs.dataset.source_path=/nvs-leaderboard-data/$scene/train \
     gs.dataset.model_path=/nvs-leaderboard-output/$scene/$method \
-    train.gs_epochs=10 \
-    gs.opt.save_iterations=[10] \
+    train.gs_epochs=30000 \
     init_wC.use=True \
     init_wC.matches_per_ref=15_000 \
     init_wC.nns_per_ref=3 \
@@ -40,7 +39,7 @@ python train.py wandb.mode="disabled" \
 # eg: python render.py --data /nvs-leaderboard-data/$scene/test --output /nvs-leaderboard-output/$scene/$method/ 
 # for testing: python ./submodules/gaussian-splatting/render.py --iteration 10 -s /nvs-leaderboard-data/mipnerf360/bicycle/train -m /nvs-leaderboard-output/mipnerf360/bicycle/edgs --eval --skip_train
 python ./submodules/gaussian-splatting/render.py \
-    --iteration 10 \
+    --iteration 30000 \
     -s /nvs-leaderboard-data/$scene/train \
     -m /nvs-leaderboard-output/$scene/$method \
     --eval \
