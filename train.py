@@ -30,7 +30,7 @@ def main(cfg: omegaconf.DictConfig):
                 "images": cfg.gs.dataset.images,
                 "depths": "",
                 "resolution": -1,
-                "_white_background": cfg.gs.dataset.white_background,
+                "white_background": cfg.gs.dataset.white_background,
                 "train_test_exp": False,
                 "data_device": cfg.gs.dataset.data_device,
                 "eval": False,
