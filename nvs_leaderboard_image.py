@@ -15,7 +15,7 @@ image = (
         {
             # Set Torch CUDA Compatbility to be for RTX 4090, T4, L40s, and A100
             # If using a different GPU, make sure its torch cuda architecture version is added to the list
-            "TORCH_CUDA_ARCH_LIST": "7.5;8.0;8.9;9.0;9.1",
+            "TORCH_CUDA_ARCH_LIST": "7.5;8.0;8.9;9.0",
             # Set environment variable to avoid interactive prompts from installing packages
             "DEBIAN_FRONTEND": "noninteractive",
             "TZ": "America/New_York",
