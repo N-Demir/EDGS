@@ -22,11 +22,13 @@ rm -rf /nvs-leaderboard-output/$scene/$method_name
 start_time=$(date +%s)
 
 ######## START OF YOUR CODE ########
+# TODO: Change the iterations to the full number
 # Train using the train split in the dataset folder
 # eg: python train.py --data /nvs-leaderboard-data/$scene/train --output /nvs-leaderboard-output/$scene/$method_name/
 python train.py wandb.mode="disabled" \
     gs.dataset.source_path=/nvs-leaderboard-data/$scene \
     gs.dataset.model_path=/nvs-leaderboard-output/$scene/$method_name \
+    gs.dataset.eval=True \
     train.gs_epochs=10 \
     init_wC.use=True \
     init_wC.matches_per_ref=15_000 \
@@ -40,10 +42,11 @@ python ./submodules/gaussian-splatting/render.py \
     -s /nvs-leaderboard-data/$scene \
     -m /nvs-leaderboard-output/$scene/$method_name \
     --eval
-    # --skip_train
 
 # At the end, move your renders into the `expected_output_folder`
 # eg: mv /nvs-leaderboard-output/$scene/$method_name/test/ours_30000/renders $expected_output_folder
+
+mv /nvs-leaderboard-output/$scene/$method_name/test/ours_10/renders $expected_output_folder
 ######## END OF YOUR CODE ########
 
 # Record end time and show duration
