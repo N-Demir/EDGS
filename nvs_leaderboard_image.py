@@ -6,6 +6,8 @@
 # - avoid using conda installs (just replace them with pip installs) because getting conda initialized in docker is a pain
 # 
 # Beam will handle building the docker image from this file, but you can also build it yourself and run it wherever you want
+from pathlib import Path
+
 from modal import Image
 
 image = (
@@ -49,7 +51,7 @@ image = (
             libxxf86vm-dev \
             && rm -rf /var/lib/apt/lists/*"
     )
-    .workdir("/root/workspace")
+    .workdir(f"/root/{Path.cwd().name}")
 
     ###### Your Code Here ######
     # Probably easiest to pull the repo from github, but you can also copy files from your local machine with COPY 
