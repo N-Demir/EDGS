@@ -51,4 +51,4 @@ mv /nvs-leaderboard-output/$scene/$method_name/test/ours_30000/renders $expected
 
 # Record end time and show duration
 end_time=$(date +%s)
-echo $((end_time - start_time)) > /nvs-leaderboard-output/$scene/$method_name/training_time.txt
+echo $((end_time - start_time)) > /nvs-leaderboard-output/$scene/$method_name/time.txt
