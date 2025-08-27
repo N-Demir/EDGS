@@ -15,7 +15,7 @@ app = modal.App(
     image=(
         image  # If using Dockerfile, replace with `modal.Image.from_dockerfile("Dockerfile")`
         # Overwrite build repo (which is only pulled in once for install) with the current local working directory
-        .add_local_dir(Path.cwd(), f"/root/{Path.cwd().name}")
+        .add_local_dir(Path.cwd(), f"/root/{method_name}")
     ),
     volumes=modal_volumes,
 )
@@ -69,7 +69,7 @@ def eval(scene: str):
 
     with log_max_gpu_memory(f"{output_folder}/max_gpu_memory.txt"):
         with log_time(f"{output_folder}/time.txt"):
-            os.system(f"bash eval.sh {data_folder} {output_folder}")
+            os.system(f"bash nvs-bench/eval.sh {data_folder} {output_folder}")
 
     output_volume.commit()
 

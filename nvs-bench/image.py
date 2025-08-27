@@ -3,9 +3,10 @@ from pathlib import Path, PurePosixPath
 from modal import Image, Volume
 
 method_name = Path.cwd().name
-assert method_name != "nvs-bench", (
-    "nvs-bench must be called from the method's directory, not the nvs-bench subdirectory. Eg: `modal run nvs-bench/image.py`."
-)
+# TODO: Add this back in
+# assert method_name != "nvs-bench", (
+#     "nvs-bench must be called from the method's directory, not the nvs-bench subdirectory. Eg: `modal run nvs-bench/image.py`."
+# )
 
 data_volume = Volume.from_name("nvs-bench-data", create_if_missing=True)
 output_volume = Volume.from_name("nvs-bench-output", create_if_missing=True)
@@ -15,7 +16,6 @@ modal_volumes: dict[str | PurePosixPath, Volume] = {
     "/nvs-bench-output": output_volume,
     # "/root/.cursor-server": Volume.from_name("cursor-volume", create_if_missing=True),
 }
-
 
 image = (
     Image.from_registry("pytorch/pytorch:2.4.1-cuda12.1-cudnn9-devel")
@@ -57,11 +57,12 @@ image = (
             libxxf86vm-dev \
             && rm -rf /var/lib/apt/lists/*"
     )
-    .workdir(f"/root/{Path.cwd().name}")
+    .workdir(f"/root/{method_name}")
+
     ###### Your Code Here ######
     # Probably easiest to pull the repo from github, but you can also copy files from your local machine with add_local_dir
     # eg: RUN git clone https://github.com/graphdeco-inria/gaussian-splatting.git . --recursive
-    .run_commands("git clone -b nvs-leaderboard https://github.com/N-Demir/EDGS.git --recursive .")
+    .run_commands("git clone -b nvs-bench https://github.com/N-Demir/EDGS.git --recursive .")
     # Install (avoid conda installs because they don't work well in dockerfile situations)
     # Separating these on separate lines helps if there are errors (previous lines will be cached) especially on the large package installs
     # eg:
