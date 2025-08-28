@@ -54,9 +54,16 @@ image = (
             libxrandr-dev \
             libxxf86vm-dev \
             libxxf86dga-dev \
-            libxxf86vm-dev \
-            && rm -rf /var/lib/apt/lists/*"
+            libxxf86vm-dev"
     )
+    # Install gsutil (for downloading datasets the first time)
+    .apt_install("curl", "ca-certificates", "gnupg")
+    .run_commands(
+        "curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -",
+        "echo 'deb https://packages.cloud.google.com/apt cloud-sdk main' | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list",
+        "apt-get update && apt-get install -y google-cloud-cli"
+    )
+    # Set the working dir
     .workdir(f"/root/{method_name}")
 
     ###### Your Code Here ######

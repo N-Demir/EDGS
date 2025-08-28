@@ -9,7 +9,6 @@ fi
 data_folder=$1
 output_folder=$2
 
-
 ######## START OF YOUR CODE ########
 # 1) Train 
 #   python train.py --data $data_folder --output $output_folder --eval

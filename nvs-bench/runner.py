@@ -7,8 +7,14 @@ from pathlib import Path
 from contextlib import contextmanager
 import shutil
 
+# print the current working directory
+print("--------------------------------")
+print(Path.cwd())
+# Print this file's path
+print(Path(__file__))
+
 import modal
-from image import image, modal_volumes, data_volume, output_volume, method_name
+from .image import image, modal_volumes, data_volume, output_volume, method_name
 
 app = modal.App(
     "nvs-bench-runner-" + method_name,
@@ -57,11 +63,18 @@ def log_time(log_file: str):
     timeout=3600 * 8,
     gpu="L40S",
 )
-def eval(scene: str):
+def eval(data: str):
     data_volume.reload()
 
-    data_folder = Path(f"/nvs-bench-data/{scene}/")
-    output_folder = Path(f"/nvs-bench-output/{scene}/{method_name}/")
+    data_folder = Path(f"/nvs-bench-data/{data}/")
+    output_folder = Path(f"/nvs-bench-output/{data}/{method_name}/")
+
+    # Check if the data exists
+    if not data_folder.exists():
+        # Download from gcs
+        dataset = data.split("/")[0]
+        os.system(f"mkdir -p /nvs-bench-data/{dataset}/")
+        os.system(f"gsutil -m cp -r gs://nvs-bench/data/{data} /nvs-bench-data/{dataset}/")
 
     # Clean output folder
     shutil.rmtree(output_folder, ignore_errors=True)
@@ -105,9 +118,11 @@ def full_eval():
 
 
 @app.local_entrypoint()
-def main(scene: str | None = None):
+def main(data: str | None = None):
     """Run train/render on a scene (eg: mipnerf360/bicycle) or if not provided the full eval"""
-    if scene is not None:
-        eval.remote(scene)
+    if data is not None:
+        # Assert there's only one / in the data
+        assert data.count("/") == 1, "data must be in the format <dataset>/<scene>"
+        eval.remote(data)
     else:
         full_eval()
