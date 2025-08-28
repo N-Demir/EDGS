@@ -6,14 +6,6 @@ import time
 from pathlib import Path
 from contextlib import contextmanager
 import shutil
-import gpu_tracker as gput
-
-# print the current working directory
-print("--------------------------------")
-print(Path.cwd())
-# Print this file's path
-print(Path(__file__))
-
 import modal
 from .image import image, modal_volumes, data_volume, output_volume, method_name
 
@@ -31,6 +23,8 @@ app = modal.App(
 @contextmanager
 def log_max_gpu_memory(log_file: str):
     """Context manager to track GPU memory usage and log maximum memory to a file."""
+    import gpu_tracker as gput
+
     with gput.Tracker(sleep_time=0.1, gpu_ram_unit="megabytes", disable_logs=True) as t:
         yield
 
