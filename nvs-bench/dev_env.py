@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 
 import modal
-from image import image, modal_volumes, method_name
+from .image import image, modal_volumes, method_name
 
 
 # Necessary for git pushes to work from the remote machine
@@ -13,7 +13,7 @@ local_users_git_name = subprocess.check_output(["git", "config", "--global", "us
 local_users_git_email = subprocess.check_output(["git", "config", "--global", "user.email"], text=True).strip()
 
 app = modal.App(
-    "nvs-bench-dev-env-" + method_name,
+    "nvs-bench",
     image=(
         image  # If using Dockerfile, replace with `modal.Image.from_dockerfile("Dockerfile")`
         # Configure git

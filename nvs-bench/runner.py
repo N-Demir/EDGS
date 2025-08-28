@@ -17,7 +17,7 @@ import modal
 from .image import image, modal_volumes, data_volume, output_volume, method_name
 
 app = modal.App(
-    "nvs-bench-runner-" + method_name,
+    "nvs-bench",
     image=(
         image  # If using Dockerfile, replace with `modal.Image.from_dockerfile("Dockerfile")`
         # Overwrite build repo (which is only pulled in once for install) with the current local working directory
