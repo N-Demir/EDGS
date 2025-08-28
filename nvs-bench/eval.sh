@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Check if data_folder and output_folder arguments are provided
 if [ $# -ne 2 ]; then
@@ -30,6 +31,7 @@ python ./submodules/gaussian-splatting/render.py \
     --iteration 30000 \
     -s $data_folder \
     -m $output_folder \
+    --skip_train \
     --eval
 
 mv $output_folder/test/ours_30000/renders $output_folder/test_renders

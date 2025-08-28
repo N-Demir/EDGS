@@ -47,17 +47,12 @@ def log_time(log_file: str):
     gpu="L40S",
 )
 def eval(data: str):
-    data_volume.reload()
-
     data_folder = Path(f"/nvs-bench-data/{data}/")
     output_folder = Path(f"/nvs-bench-output/{data}/{method_name}/")
 
-    # Check if the data exists
-    if not data_folder.exists():
-        # Download from gcs
-        dataset = data.split("/")[0]
-        os.system(f"mkdir -p /nvs-bench-data/{dataset}/")
-        os.system(f"gsutil -m cp -r gs://nvs-bench/data/{data} /nvs-bench-data/{dataset}/")
+    # Download from gcs (noop if already exists)
+    os.system(f"mkdir -p /nvs-bench-data/{data}/")
+    os.system(f"gsutil -m rsync -r -d gs://nvs-bench/data/{data} /nvs-bench-data/{data}")
 
     # Clean output folder
     shutil.rmtree(output_folder, ignore_errors=True)
@@ -72,7 +67,7 @@ def eval(data: str):
 
 def full_eval():
     """Runs without waiting for each scene to finish"""
-    BENCHMARK_SCENES = [
+    BENCHMARK_DATA = [
         # Mipnerf360
         "mipnerf360/bicycle",
         "mipnerf360/treehill",
@@ -96,8 +91,7 @@ def full_eval():
         "zipnerf/nyc",
     ]
 
-    for scene in BENCHMARK_SCENES:
-        eval.spawn(scene)
+    eval.for_each(BENCHMARK_DATA)
 
 
 @app.local_entrypoint()
