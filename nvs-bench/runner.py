@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from contextlib import contextmanager
 import shutil
+import gpu_tracker as gput
 
 # print the current working directory
 print("--------------------------------")
@@ -30,23 +31,11 @@ app = modal.App(
 @contextmanager
 def log_max_gpu_memory(log_file: str):
     """Context manager to track GPU memory usage and log maximum memory to a file."""
-    try:
-        import torch
-
-        gpu_available = torch.cuda.is_available()
-    except ImportError:
-        gpu_available = False
-
-    if gpu_available:
-        torch.cuda.reset_peak_memory_stats()
-        yield
-        peak_mem = torch.cuda.max_memory_allocated()
-
-        with open(log_file, "w") as f:
-            f.write(f"{peak_mem / 1024**2:.1f}")
-    else:
+    with gput.Tracker(sleep_time=0.1, gpu_ram_unit="megabytes", disable_logs=True) as t:
         yield
 
+    with open(log_file, "w") as f:
+        f.write(str(int(t.resource_usage.max_gpu_ram.system))) # type: ignore
 
 @contextmanager
 def log_time(log_file: str):

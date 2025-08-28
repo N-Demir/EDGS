@@ -63,6 +63,8 @@ image = (
         "echo 'deb https://packages.cloud.google.com/apt cloud-sdk main' | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list",
         "apt-get update && apt-get install -y google-cloud-cli"
     )
+    # Install gpu_tracker
+    .run_commands("pip install gpu_tracker")
     # Set the working dir
     .workdir(f"/root/{method_name}")
 

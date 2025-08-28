@@ -8,6 +8,14 @@ import modal
 from .image import image, modal_volumes, method_name
 
 
+# Check if we are in a submodule (common scenario if this method is being run from the submodule "methods/" folder of "nvs-bench")
+# The problem is that dev_env.py tries to configure git 
+# A possible fix is to manually mess around with the git config with the following steps:
+# from the subrepo folder. Say /method/EDGS/
+# 1) rm .git && cp -r ../../.git/modules/methods/EDGS .git
+# 2) sed -i '' '/worktree/d' .git/config
+
+
 # Necessary for git pushes to work from the remote machine
 local_users_git_name = subprocess.check_output(["git", "config", "--global", "user.name"], text=True).strip()
 local_users_git_email = subprocess.check_output(["git", "config", "--global", "user.email"], text=True).strip()
