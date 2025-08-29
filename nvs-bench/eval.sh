@@ -17,3 +17,21 @@ output_folder=$2
 #   python render.py --data $data_folder/test --output $output_folder --eval
 # 3) Move the renders into `$output_folder/test_renders`
 #   mv $output_folder/test/ours_30000/renders $output_folder/test_renders
+
+python train.py wandb.mode="disabled" \
+    gs.dataset.source_path=$data_folder \
+    gs.dataset.model_path=$output_folder \
+    gs.dataset.eval=True \
+    init_wC.use=True \
+    init_wC.matches_per_ref=15_000 \
+    init_wC.nns_per_ref=3 \
+    init_wC.num_refs=180
+
+python ./submodules/gaussian-splatting/render.py \
+    --iteration 30000 \
+    -s $data_folder \
+    -m $output_folder \
+    --skip_train \
+    --eval
+
+mv $output_folder/test/ours_30000/renders $output_folder/test_renders

@@ -75,4 +75,14 @@ image = (
     # .run_commands("pip install submodules/diff-gaussian-rasterization")
     # .run_commands("pip install -e .")
     # Note: If your run_commands step needs access to a gpu it's actually possible to do that through "run_commands(gpu='L40S', ...)"
+    
+    .run_commands("git clone -b nvs-bench https://github.com/N-Demir/EDGS.git --recursive .")
+    .run_commands("pip install -e submodules/gaussian-splatting/submodules/diff-gaussian-rasterization")
+    .run_commands("pip install -e submodules/gaussian-splatting/submodules/simple-knn")
+    .run_commands("pip install -e submodules/RoMa")
+    .run_commands(
+        "pip install wandb hydra-core tqdm torchmetrics lpips matplotlib rich plyfile imageio imageio-ffmpeg numpy==1.26.4"
+    )
+    .run_commands("pip install gradio plotly scikit-learn moviepy==2.1.1 ffmpeg")
+    .run_commands("pip install open3d")
 )
