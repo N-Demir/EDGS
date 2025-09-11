@@ -1,3 +1,17 @@
+"""Image definition (modal's pythonic version of a Dockerfile)
+
+What you'll want to change:
+- the base image to a cuda and torch version that matches your method's requirements. Though our defaults have worked
+for most methods so far.
+- if you already have a Dockerfile and want to keep using it, replace the Image.from_registry() line with Image.from_dockerfile("Dockerfile").
+You might also want to change the `workdir` to keep it consistent with the Dockerfile's.
+- add your installation commands in the bottom section. Modal's syntax almost identically follows dockerfile's.
+  - note that if your install commands needs access to a gpu that's possible
+  - also, avoid using conda and use pip instead (installing and initializing conda in dockerfiles has caused us a lot of problems)
+
+See their docs for more info: https://modal.com/docs/guide/images
+"""
+
 from pathlib import Path, PurePosixPath
 
 from modal import Image, Volume
@@ -7,17 +21,14 @@ assert method_name != "nvs-bench", (
     "nvs-bench must be called from the method's directory, not the nvs-bench subdirectory. Eg: `modal run nvs-bench/image.py`."
 )
 
-data_volume = Volume.from_name("nvs-bench-data", create_if_missing=True)
-output_volume = Volume.from_name("nvs-bench-output", create_if_missing=True)
+nvs_bench_volume = Volume.from_name("nvs-bench", create_if_missing=True)
 
 modal_volumes: dict[str | PurePosixPath, Volume] = {
-    "/nvs-bench-data": data_volume,
-    "/nvs-bench-output": output_volume,
-    # "/root/.cursor-server": Volume.from_name("cursor-volume", create_if_missing=True),
+    "/nvs-bench": nvs_bench_volume,
 }
 
 image = (
-    Image.from_registry("pytorch/pytorch:2.4.1-cuda12.1-cudnn9-devel")
+    Image.from_registry("pytorch/pytorch:2.4.1-cuda12.1-cudnn9-devel")  # find others at: https://hub.docker.com/
     .env(
         {
             # Set Torch CUDA Compatbility to be for RTX 4090, T4, L40s, and A100
